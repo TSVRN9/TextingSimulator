@@ -1,19 +1,20 @@
 {
   "name": "TextingSimulator",
   "version": "1.0.0",
-  "main": "src/index.html",
   "repository": "https://github.com/TSVRN9/TextingSimulator.git",
   "author": "tavern <66744142+TSVRN9@users.noreply.github.com>",
   "license": "MIT",
   "private": true,
   "devDependencies": {
     "autoprefixer": "^10.4.13",
+    "gh-pages": "^4.0.0",
     "parcel": "^2.8.1",
     "postcss": "^8.4.20",
     "tailwindcss": "^3.2.4"
   },
   "scripts": {
-    "start": "parcel",
-    "build": "node encrypt.js && parcel build"
+    "start": "parcel serve src/index.html",
+    "build": "node encrypt.js && parcel build src/index.html",
+    "deploy": "gh-pages -d dist"
   }
 }
