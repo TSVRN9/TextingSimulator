@@ -6,15 +6,21 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
+    "@parcel/packager-raw-url": "2.8.1",
+    "@parcel/transformer-webmanifest": "2.8.1",
     "autoprefixer": "^10.4.13",
+    "crypto-js": "^4.1.1",
     "gh-pages": "^4.0.0",
     "parcel": "^2.8.1",
     "postcss": "^8.4.20",
-    "tailwindcss": "^3.2.4"
+    "tailwindcss": "^3.2.4",
+    "terser": "^5.16.1"
   },
   "scripts": {
-    "start": "parcel serve src/index.html",
+    "start": "parcel serve src/index.html --https",
     "build": "node encrypt.js && parcel build src/index.html",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "encrypt": "node encrypt.js",
+    "clean": "rm -r dist && rm -r .parcel-cache"
   }
 }
