@@ -1,10 +1,8 @@
 {
   "name": "Texting Simulator",
   "short_name": "Texting Simulator",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#fdfdfd",
-  "theme_color": "#db4938",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -38,6 +36,13 @@
     {
       "src": "./assets/icons/512x512.png",
       "type": "image/png", "sizes": "512x512"
+    },
+    {
+      "src": "./assets/icons/512x512-transparent.png",
+      "type": "image/png", "sizes" :"512x512",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
 }
