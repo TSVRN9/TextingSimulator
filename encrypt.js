@@ -29,12 +29,13 @@ const files =
             const encryptedFilename = filename.substring(0, filename.length - '.js'.length) + '.json';
             const encryptedpath = path.join(encryptedDirectory, encryptedFilename);
         
-            fs.writeFileSync(encryptedpath, 
-                JSON.stringify({ 
+            const json = JSON.stringify({ 
                     ciphertext: ciphertext.toString(CryptoJS.enc.Base64), 
                     salt: salt.toString(CryptoJS.enc.Base64),
                     iv: iv.toString(CryptoJS.enc.Base64), 
-                }, null, null));
+                }, null, null);
+
+            fs.writeFileSync(encryptedpath, json);
         
             console.log(`Encrypted ${filename.cyan} to ${encryptedFilename.toString().cyan}`);
         

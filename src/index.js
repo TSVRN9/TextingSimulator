@@ -1,5 +1,28 @@
-const CryptoJS = require('crypto-js');
+import CryptoJS from 'crypto-js';
+import axios from 'axios';
 
+import Alpine from 'alpinejs';
+import persist from '@alpinejs/persist';
+import intersect from '@alpinejs/intersect';
+
+Alpine.plugin(persist);
+Alpine.plugin(intersect);
+window.Alpine = Alpine;
+window.decrypt = decrypt;
+window.search = search;
+window.params = new URLSearchParams(window.location.search);
+
+// clear window params
+history.pushState(null, "", location.href.split("?")[0]);
+// start helper methods
+const DATA_URL = `./encrypted/data.json`;
+
+
+/**
+ * @param {string} password 
+ * @param {string} filename 
+ * @returns {object}
+ */
 async function decrypt(password, filename) {
     const { ciphertext, salt, iv } = (await axios.get(`./encrypted/${filename}`)).data;
     const encrypted = CryptoJS.lib.CipherParams.create({
@@ -7,12 +30,31 @@ async function decrypt(password, filename) {
         salt: CryptoJS.enc.Base64.parse(salt),
         iv: CryptoJS.enc.Base64.parse(iv),
     })
-    console.log(encrypted);
     const decrypted = CryptoJS.AES.decrypt(encrypted, password);
     return JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
 }
 
+let files = []
+
+async function search(password) {
+    if (!files.length) {
+        files = (await axios.get(DATA_URL)).data;
+    }
+
+    for (file of files) {
+        try {
+            const d = await decrypt(password, file);
+            return [file, d];
+        } catch (e) {}
+    }
+    
+    throw Error('None Found');
+}
+
 async function registerServiceWorker() {
+    // quit if localhost
+    if (location.hostname == 'localhost') return;
+
     if ('serviceWorker' in navigator) {
         try {
             // trick to get parcel to not compile service-worker.js
@@ -33,6 +75,4 @@ async function registerServiceWorker() {
     }
 }
 
-window.on('load', () => {
-    registerServiceWorker();
-});
+Alpine.start();

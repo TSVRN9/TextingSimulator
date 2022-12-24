@@ -9,6 +9,7 @@
     "@parcel/packager-raw-url": "2.8.1",
     "@parcel/transformer-webmanifest": "2.8.1",
     "autoprefixer": "^10.4.13",
+    "base256-encoding": "^2.0.1",
     "colors": "^1.4.0",
     "crypto-js": "^4.1.1",
     "gh-pages": "^4.0.0",
@@ -20,7 +21,7 @@
   },
   "scripts": {
     "start": "yarn encrypt && parcel serve src/index.html",
-    "build": "parcel build src/index.html --public-url . --no-content-hash && yarn post-build",
+    "build": "yarn clean && parcel build src/index.html --public-url . --no-content-hash && yarn post-build",
     "post-build": "node encrypt.js && workbox generateSW",
     "deploy": "gh-pages -d dist",
     "encrypt": "node encrypt.js",
@@ -31,5 +32,12 @@
     "inDev": true,
     "strategy": "default",
     "importWorkboxFrom": "local"
+  },
+  "dependencies": {
+    "@alpinejs/intersect": "^3.10.5",
+    "@alpinejs/persist": "^3.10.5",
+    "alpinejs": "^3.10.5",
+    "axios": "^1.2.1",
+    "cryptojs": "^2.5.3"
   }
 }
