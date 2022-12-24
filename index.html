@@ -1,1 +1,27 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Texting Simulator</title><link href="manifest.webmanifest" rel="manifest"><link href="index.css" rel="stylesheet"><link rel="icon" type="image/x-icon" href="favicon.ico"><link rel="apple-touch-icon" href="512x512.png"><script defer src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js"></script><script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script><script defer src="index.js" type="module"></script></head><body class="bg-black"> <div class="bg-slate-600 flex items-center m-auto max-w-md overflow-hidden p-20 rounded-xl shrink-0 text-center"> <form> <label for="password" class="font-semibold px-2 text-white">Password</label> <hr class="py-1"> <input type="text" name="password" class="px-4 rounded-xl" placeholder="Enter Password"> </form> </div> </body></html>
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Texting Simulator</title><link href="manifest.webmanifest" rel="manifest"><link href="index.0168193b.css" rel="stylesheet"><link rel="icon" type="image/x-icon" href="favicon.6d74238e.ico"><link rel="apple-touch-icon" href="512x512.cc535880.png"><style>[x-cloak]{display:none!important}</style><script defer src="index.16b57466.js" type="module"></script></head><body class="bg-black">  <div x-data="{ password: $persist(''), filename: $persist(''), messageData: {}, initialized: 0, toInitialize: 2, inputPassword: false }"> <div x-data x-init="if (params.has('password')) { search(params.get('password')).then(res => [filename, messageData] = res).catch(() => {}).finally(() => initialized++) } else initialized++"></div> <div x-data x-init="decrypt(password, filename).then(v => messageData = v).catch(() => {}).finally(() => initialized++ );"></div> <template x-if="initialized == toInitialize && Object.keys(messageData).length"> <div x-data="{ toDisplay: [], currentIndex: 0, currentName: null, initialDelay: 0, delay: 1500, delayPerLetter: 40}" x-init="
+$watch('messageData', () => {
+    if (messageData === {})
+        toDisplay = [];
+    currentIndex = 0;
+    currentName = 'start';
+});
+$watch('toDisplay', () => {
+    if (toDisplay != [] && currentIndex != messageData[currentName].length) {
+        const next = messageData[currentName][currentIndex++];
+        setTimeout(() => {
+            toDisplay.push(next);
+        }, delay + next.length * delayPerLetter);
+    }
+});
+
+$watch('currentName', () => {
+    if (currentName == 'start') {
+        toDisplay = [];
+    }
+    currentIndex = 0;
+    const next = messageData[currentName][currentIndex++];
+    toDisplay.push(next);
+});
+
+setTimeout(() => currentName = 'start', initialDelay);
+                "> <template x-for="(d, i) in toDisplay" :key="i"> <div x-data="{ show: false }" x-init="setTimeout(() => show = true, 0)"> <div x-show="show && typeof d === 'string'" x-transition> <div> <div class="text-bubble" x-text="d"></div> <div class="text-triangle"></div> </div> </div> <template x-if="d instanceof Object"> <div class="flex flex-row h-32 items-center justify-around mt-10" x-data="{ choices: Object.keys(d), chosen: false }"> <template x-for="choice in choices"> <div x-data="{ show: false }" x-init="setTimeout(() => show = true, 0)"> <div x-show="show" x-transition> <button class="bg-white duration-100 ease-in-out rounded-xl" :class="chosen == choice ? 'p-6' : 'p-4'" x-text="choice" @click="chosen = choice; currentName = d[choice]" :disabled="chosen"></button> </div> </div> </template> </div> </template> </div> </template> </div> </template> <template x-if="inputPassword || (initialized == toInitialize && !Object.keys(messageData).length)" x-transition> <div class="absolute backdrop-blur-sm flex h-screen items-center justify-center left-0 top-0 w-screen"> <form @submit.prevent="search(password).then(res => [filename, messageData] = res).catch(() => messageData = {})"> <div class="bg-slate-500 flex flex-col gap-y-5 m-20 max-w-xl px-20 py-10 rounded-2xl text-slate-700"> <input class="border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-slate-600 hover:border-slate-600 p-4 rounded-full text-center" name="password" placeholder="Enter Password" x-model:value="password"> <input class="active:bg-slate-200 bg-white border-2 border-transparent focus:ring-4 focus:ring-slate-600 hover:border-slate-600 mx-20 rounded-full" type="submit" value="Enter"> </div> </form> </div> </template> </div> </body></html>
