@@ -19,12 +19,31 @@
             <div x-data x-init="if (params.has('password')) { search(params.get('password')).then(res => [filename, messageData] = res).catch(() => {}).finally(() => initialized++) } else initialized++"></div>
             <div x-data x-init="decrypt(password, filename).then(v => messageData = v).catch(() => {}).finally(() => initialized++ );"></div>
 
+            <!-- Back Button -->
+            <template x-if="initialized == toInitialize && Object.keys(messageData).length">
+                <button class="fixed text-white flex t-0 m-4 gap-4 md:m-6 z-10 rounded-md bg-blue-300 p-2 md:p-4 drop-shadow-sm hover:bg-blue-700 active:bg-blue-700" @click="inputPassword = ! inputPassword">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                          <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 010 1.06L4.81 8.25H15a6.75 6.75 0 010 13.5h-3a.75.75 0 010-1.5h3a5.25 5.25 0 100-10.5H4.81l4.72 4.72a.75.75 0 11-1.06 1.06l-6-6a.75.75 0 010-1.06l6-6a.75.75 0 011.06 0z" clip-rule="evenodd" />
+                        </svg>
+                        <div class="invisible w-0 h-0 md:visible md:w-auto md:h-auto -m-2 md:m-auto">
+                            Back
+                        </div>
+                </button>
+            </template>
+
             <!-- This monster is going to manage pretty much all of the game state. answered represents the choices chosen -->
             <template x-if="initialized == toInitialize && Object.keys(messageData).length">
-                <div class="flex flex-col max-w-2xl" x-data="{ toDisplay: $persist([]).using(sessionStorage), currentIndex: $persist(0).using(sessionStorage), currentName: $persist('start').using(sessionStorage), initialDelay: 1000, delay: 100, delayPerLetter: 10, choicesChosen: $persist([]).using(sessionStorage) }" x-init="
+                <div class="flex flex-col max-w-2xl mx-auto pt-16" 
+                x-data="{ 
+                    toDisplay: $persist([]).using(sessionStorage), 
+                    currentIndex: $persist(0).using(sessionStorage), 
+                    currentName: $persist('start').using(sessionStorage), 
+                    initialDelay: 1000, 
+                    delay: 1000, 
+                    delayPerLetter: 50, 
+                    choicesChosen: $persist([]).using(sessionStorage) }" x-init="
 $watch('messageData', () => {
-    if (messageData === {})
-        toDisplay = [];
+    toDisplay = [];
     currentIndex = 0;
     choicesChosen = [];
     currentName = 'start';
@@ -77,10 +96,6 @@ setTimeout(() => {
 })
 new ResizeObserver(scrollToBottom).observe($el);
                 ">
-                    <!-- Nav Bar-->
-                    <div class="sticky t-0 w-max flex justify-start">
-                        <button @click="inputPassword = 0"></button>
-                    </div>
                     <template x-for="(d, i) in toDisplay" :key="i">
                         <div x-data="{ show: false }" x-init="setTimeout(() => show = true, 0)">
                             <!-- Represents someone elses message -->
@@ -95,20 +110,29 @@ new ResizeObserver(scrollToBottom).observe($el);
                                 <div class="flex justify-around items-center flex-row mt-6 min-h-xs" x-data="{ choices: Object.keys(d), chosen: $persist(false).as('_x_choice_' + i).using(sessionStorage) }" x-init="chosen = choicesChosen.indexOf(chosen) >= 0 ? chosen : false">
                                     <template x-for="choice in choices">
                                         <div x-show="show" x-transition>
-                                            <button class="ease-in-out duration-100 bg-white rounded-xl px-2 py-4 md:px-4" :class="chosen === false ? '' : (chosen === choice ? '' : 'p-2 bg-gray-700')" x-text="choice" @click="chosen = choice; choicesChosen.push(choice); if (d[choice] === 'exit') { inputPassword = true } else { currentName = d[choice] }" :disabled="chosen"></button>
+                                            <button class="ease-in-out duration-100 bg-white rounded-xl px-2 py-4 md:px-4 m-4 hover:shadow-inner" 
+                                            @click="chosen = choice; choicesChosen.push(choice); if (d[choice] === 'exit') { inputPassword = true } else { currentName = d[choice] }" 
+                                            :disabled="chosen"
+                                            :class="chosen === false ? 'hover:-translate-y-1' : (chosen === choice ? 'hover:-translate-y-1' : 'py-1 px-1 bg-gray-700')" 
+                                            x-text="choice"></button>
                                         </div>
                                     </template>
                                 </div>
                             </template>
                         </div>
                     </template>
+                    <!-- Typing indicator -->
                     <div x-show="!messageData[currentName] || currentIndex != messageData[currentName].length" x-transition x-transition:leave.duration.0ms>
                         <div class="text-bubble"><span class="animate-pulse">⬤</span><span class="animate-pulse animation-delay-150">⬤</span><span class="animate-pulse animation-delay-300">⬤</span></div>
                         <div class="text-triangle"></div>
                     </div>
                     <!-- Display scroll to bottom button -->
-                    <div x-data="{ clicked: false, show: false }" x-show="show && !clicked" x-init="document.addEventListener('scroll', () => { show = distanceToBottom() >= window.innerHeight / 3; if (distanceToBottom() == 0) clicked = false; }); $watch('currentName', () => { if (currentName === 'start') clicked = true });" x-transition x-transition:leave.duration.0ms class="flex justify-center fixed bottom-8 w-full pointer-events-none">
-                        <button class="rounded-full text-white bg-blue-300 pointer-events-auto w-8 h-8 text-center p-1 animate-bounce" @click="clicked = true; scrollToBottom();">
+                    <div class="flex justify-center fixed bottom-8 left-0 right-0 mx-auto pointer-events-none"
+                    x-data="{ clicked: false, show: false }" 
+                    x-show="show && !clicked" 
+                    x-init="document.addEventListener('scroll', () => { show = distanceToBottom() >= window.innerHeight / 6; if (distanceToBottom() == 0) clicked = false; }); $watch('currentName', () => { if (currentName === 'start') clicked = true });" 
+                    x-transition x-transition:leave.duration.0ms >
+                        <button class="rounded-full text-white bg-blue-300 pointer-events-auto w-8 md:w-12 text-center p-1 drop-shadow-md animate-bounce mx-auto hover:animation-pause hover:bg-blue-700 active:bg-blue-700" @click="clicked = true; scrollToBottom();">
                             <svg class="block mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75" />
                             </svg>
@@ -116,16 +140,12 @@ new ResizeObserver(scrollToBottom).observe($el);
                     </div>
                 </div>
             </template>
-
-            <template 
-                x-if="inputPassword || (initialized == toInitialize && !Object.keys(messageData).length)"
-                x-transition
-                >
-                <div class="fixed top-0 left-0 backdrop-blur-sm flex justify-center items-center h-screen w-screen">
-                    <form @submit.prevent="search(password).then(res => [filename, messageData] = res).catch(() => messageData = {}); inputPassword = false">
-                        <div class="text-slate-700 flex flex-col gap-y-5 py-10 px-10 md:px-10 rounded-2xl bg-slate-500 m-20 max-w-xl">
-                            <input class="p-4 text-center rounded-full border-2 border-transparent focus:outline-none hover:border-slate-600 focus:ring-4 focus:ring-slate-600" name="password" placeholder="Enter Password" x-model:value="password">
-                            <input class="mx-20 rounded-full border-transparent border-2 bg-white hover:border-slate-600 focus:ring-4 focus:ring-slate-600 active:bg-slate-200" type="submit" value="Enter">
+            <template x-if="inputPassword || (initialized == toInitialize && !Object.keys(messageData).length)">
+                <div class="fixed top-0 left-0 backdrop-blur-md bg-black/60 flex justify-center items-center h-screen w-screen">
+                    <form @submit.prevent="messageData = {}; search(password).then(res => [filename, messageData] = res).catch(() => messageData = {}); inputPassword = false">
+                        <div class="text-slate-700 text-center flex flex-col gap-y-5 py-10 px-10 md:px-10 rounded-2xl bg-slate-500 m-20 max-w-xl">
+                            <input class="text-center p-4 rounded-full border-2 border-transparent focus:outline-none hover:border-slate-600 focus:ring-4 focus:ring-slate-600" name="password" placeholder="Enter Password" x-model:value="password">
+                            <input class="mx-10 rounded-full border-transparent border-2 bg-white hover:border-slate-600 focus:ring-4 focus:ring-slate-600 active:bg-slate-200" type="submit" value="Enter">
                         </div>
                     </form>
                 </div>

@@ -19,6 +19,10 @@
         border-top-width: calc(var(--width) * var(--stretch));
     }
     
+    .animation-pause {
+        animation-play-state: paused;
+    }
+
     button {
         @apply outline-none
     }

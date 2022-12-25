@@ -42,8 +42,6 @@ async function search(password) {
         files = (await axios.get('./encrypted/data.json')).data;
     }
     
-    console.log(files);
-
     for (const file of files) {
         try {
             const d = await decrypt(password, file);
