@@ -4,7 +4,11 @@ module.exports = {
     "./src/**/*.{html,js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        body: ['Nunito', 'sans-serif']
+      }
+    },
   },
   plugins: [require('tailwindcss-animation-delay')],
 }
