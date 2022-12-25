@@ -1,5 +1,7 @@
 node_modules
 unencrypted/*
+!/unencrypted/example.js
+!/unencrypted/utils.js
 dist
 .parcel-cache
 config.json

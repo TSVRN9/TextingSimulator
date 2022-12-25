@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const colors = require('colors');
 const { password } = require('./config.json');
+const utils = require("./unencrypted/utils");
 
 const directory = path.join(__dirname, 'unencrypted');
 const encryptedDirectory = path.join(__dirname, 'dist', 'encrypted')
@@ -17,12 +18,15 @@ console.log(`Attempting to encrypt directory: ${directory.toString().cyan} to ${
 
 const files = 
     Promise.all(fs.readdirSync(directory)
+        .filter(f => f != 'utils.js') // ignore utils.js
         .map(async filename => {
+            
             const filepath = path.join(directory, filename);
             const contents = fs.readFileSync(filepath, { encoding: 'UTF-8' });
 
             const data = require(filepath);
-            const { ciphertext, salt, iv } = await CryptoJS.AES.encrypt(JSON.stringify(data, null, null), password);
+            const key = data.password ?? password; // checks file for file password
+            const { ciphertext, salt, iv } = await CryptoJS.AES.encrypt(JSON.stringify(data, null, null), key);
 
             // write to ./dist
             // .js to .json
