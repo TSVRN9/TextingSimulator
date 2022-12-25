@@ -111,7 +111,7 @@ new ResizeObserver(scrollToBottom).observe($el);
                                     <template x-for="choice in choices">
                                         <div x-show="show" x-transition>
                                             <button class="ease-in-out duration-100 bg-white rounded-xl px-2 py-4 md:px-4 m-4 hover:shadow-inner" 
-                                            @click="chosen = choice; choicesChosen.push(choice); if (d[choice] === 'exit') { inputPassword = true } else { currentName = d[choice] }" 
+                                            @click="if (!chosen) { chosen = choice; choicesChosen.push(choice); if (d[choice] === 'exit') { inputPassword = true } else { currentName = d[choice] } }" 
                                             :disabled="chosen"
                                             :class="chosen === false ? 'hover:-translate-y-1' : (chosen === choice ? 'hover:-translate-y-1' : 'py-1 px-1 bg-gray-700')" 
                                             x-text="choice"></button>
