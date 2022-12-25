@@ -7,16 +7,17 @@ import intersect from '@alpinejs/intersect';
 
 Alpine.plugin(persist);
 Alpine.plugin(intersect);
+
+// make all these things avaliable in the html
 window.Alpine = Alpine;
 window.decrypt = decrypt;
 window.search = search;
+window.scrollToBottom = scrollToBottom;
+window.distanceToBottom = distanceToBottom;
 window.params = new URLSearchParams(window.location.search);
 
 // clear window params
 history.pushState(null, "", location.href.split("?")[0]);
-// start helper methods
-const DATA_URL = `./encrypted/data.json`;
-
 
 /**
  * @param {string} password 
@@ -38,10 +39,12 @@ let files = []
 
 async function search(password) {
     if (!files.length) {
-        files = (await axios.get(DATA_URL)).data;
+        files = (await axios.get('./encrypted/data.json')).data;
     }
+    
+    console.log(files);
 
-    for (file of files) {
+    for (const file of files) {
         try {
             const d = await decrypt(password, file);
             return [file, d];
@@ -73,6 +76,14 @@ async function registerServiceWorker() {
             console.error(e);
         }
     }
+}
+
+function scrollToBottom() {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+function distanceToBottom() {
+    return Math.abs(document.documentElement.scrollTop + window.innerHeight - document.body.scrollHeight);
 }
 
 Alpine.start();
