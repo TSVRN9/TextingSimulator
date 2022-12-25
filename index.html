@@ -1,27 +1,56 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Texting Simulator</title><link href="manifest.webmanifest" rel="manifest"><link href="index.d96bd217.css" rel="stylesheet"><link rel="icon" type="image/x-icon" href="favicon.1edc69b0.ico"><link rel="apple-touch-icon" href="512x512.055fc8f4.png"><style>[x-cloak]{display:none!important}</style><script defer src="index.7524501b.js" type="module"></script></head><body class="bg-black md:text-base text-xs">  <div class="pb-6" x-data="{ password: $persist(''), filename: $persist(''), messageData: {}, initialized: 0, toInitialize: 2, inputPassword: false }"> <div x-data x-init="if (params.has('password')) { search(params.get('password')).then(res => [filename, messageData] = res).catch(() => {}).finally(() => initialized++) } else initialized++"></div> <div x-data x-init="decrypt(password, filename).then(v => messageData = v).catch(() => {}).finally(() => initialized++ );"></div> <template x-if="initialized == toInitialize && Object.keys(messageData).length"> <div class="flex flex-col max-w-2xl" x-data="{ toDisplay: $persist([]).using(sessionStorage), currentIndex: $persist(0).using(sessionStorage), currentName: $persist(null).using(sessionStorage), initialDelay: 1000, delay: 1500, delayPerLetter: 40 }" x-init="
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Texting Simulator</title><link href="manifest.webmanifest" rel="manifest"><link href="index.eb260f90.css" rel="stylesheet"><link rel="icon" type="image/x-icon" href="favicon.1edc69b0.ico"><link rel="apple-touch-icon" href="512x512.055fc8f4.png"><style>[x-cloak]{display:none!important}</style><script defer src="index.ff90733c.js" type="module"></script></head><body class="bg-black md:text-base text-xs">  <div class="pb-6" x-data="{ password: $persist(''), filename: $persist(''), messageData: {}, initialized: 0, toInitialize: 2, inputPassword: $persist(false) }"> <div x-data x-init="if (params.has('password')) { search(params.get('password')).then(res => [filename, messageData] = res).catch(() => {}).finally(() => initialized++) } else initialized++"></div> <div x-data x-init="decrypt(password, filename).then(v => messageData = v).catch(() => {}).finally(() => initialized++ );"></div>  <template x-if="initialized == toInitialize && Object.keys(messageData).length"> <div class="flex flex-col max-w-2xl" x-data="{ toDisplay: $persist([]).using(sessionStorage), currentIndex: $persist(0).using(sessionStorage), currentName: $persist('start').using(sessionStorage), initialDelay: 1000, delay: 100, delayPerLetter: 10, choicesChosen: $persist([]).using(sessionStorage) }" x-init="
 $watch('messageData', () => {
     if (messageData === {})
         toDisplay = [];
     currentIndex = 0;
+    choicesChosen = [];
     currentName = 'start';
 });
 $watch('toDisplay', () => {
-    if (toDisplay != [] && currentIndex != messageData[currentName].length) {
-        const next = messageData[currentName][currentIndex++];
+    if (toDisplay.length === 0) return;
+
+    if (currentIndex != messageData[currentName].length) {
+
+        const next = messageData[currentName][currentIndex];
+        
+        if (currentIndex === messageData[currentName].length - 1 && typeof next === 'string') {
+            currentName = next;
+        } else {
+            currentIndex++;
+            setTimeout(() => {
+                toDisplay.push(next);
+            }, delay + next.length * delayPerLetter);
+        }
+    }
+});
+$watch('currentName', () => {
+    if (currentName == 'start') {
+        choicesChosen = [];
+        toDisplay.length = 0;
+    }
+    
+    currentIndex = 0;
+    const next = messageData[currentName][currentIndex];
+    
+    if (currentIndex === messageData[currentName].length - 1 && typeof next === 'string') {
+        currentName = next;
+    } else {
         setTimeout(() => {
+            currentIndex++;
             toDisplay.push(next);
         }, delay + next.length * delayPerLetter);
     }
 });
-
-$watch('currentName', () => {
-    if (currentName == 'start') {
-        toDisplay = [];
+setTimeout(() => {
+    if (toDisplay != [] && currentIndex != messageData[currentName].length) {
+        const next = messageData[currentName][currentIndex];
+        if (currentIndex === messageData[currentName].length - 1 && typeof next === 'string') {
+            currentName = next;
+        } else {
+            currentIndex++;
+            toDisplay.push(next);
+        }
     }
-    currentIndex = 0;
-    const next = messageData[currentName][currentIndex++];
-    toDisplay.push(next);
-});
-
-setTimeout(() => currentName = 'start', initialDelay);
-                "> <template x-for="(d, i) in toDisplay" :key="i"> <div x-data="{ show: false }" x-init="setTimeout(() => show = true, 0)"> <div x-show="show && typeof d === 'string'" x-transition> <div> <div class="text-bubble" x-text="d"></div> <div class="text-triangle"></div> </div> </div> <template x-if="d instanceof Object"> <div class="flex flex-row items-center justify-around min-h-xs mt-6" x-data="{ choices: Object.keys(d), chosen: false }"> <template x-for="choice in choices"> <div x-data="{ show: false }" x-init="setTimeout(() => show = true, 0)"> <div x-show="show" x-transition> <button class="bg-white duration-100 ease-in-out p-4 rounded-xl" :class="chosen === false ? '' : (chosen === choice ? '' : 'p-2 bg-gray-700')" x-text="choice" @click="chosen = choice; currentName = d[choice]" :disabled="chosen"></button> </div> </div> </template> </div> </template> </div> </template> <div x-show="!messageData[currentName] || currentIndex != messageData[currentName].length" x-transition x-transition:leave.duration.0ms> <div class="text-bubble"><span class="animate-pulse">⬤⬤⬤</span></div> <div class="text-triangle"></div> </div> </div> </template> <template x-if="inputPassword || (initialized == toInitialize && !Object.keys(messageData).length)" x-transition> <div class="absolute backdrop-blur-sm flex h-screen items-center justify-center left-0 top-0 w-screen"> <form @submit.prevent="search(password).then(res => [filename, messageData] = res).catch(() => messageData = {})"> <div class="bg-slate-500 flex flex-col gap-y-5 m-20 max-w-xl md:px-10 px-10 py-10 rounded-2xl text-slate-700"> <input class="border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-slate-600 hover:border-slate-600 p-4 rounded-full text-center" name="password" placeholder="Enter Password" x-model:value="password"> <input class="active:bg-slate-200 bg-white border-2 border-transparent focus:ring-4 focus:ring-slate-600 hover:border-slate-600 mx-20 rounded-full" type="submit" value="Enter"> </div> </form> </div> </template> </div> </body></html>
+})
+new ResizeObserver(scrollToBottom).observe($el);
+                "> <template x-for="(d, i) in toDisplay" :key="i"> <div x-data="{ show: false }" x-init="setTimeout(() => show = true, 0)">  <div x-show="show && typeof d === 'string'" x-transition> <div> <div class="text-bubble" x-text="d"></div> <div class="text-triangle"></div> </div> </div>  <template x-if="d instanceof Object"> <div class="flex flex-row items-center justify-around min-h-xs mt-6" x-data="{ choices: Object.keys(d), chosen: $persist(false).as('_x_choice_' + i).using(sessionStorage) }" x-init="chosen = choicesChosen.indexOf(chosen) >= 0 ? chosen : false"> <template x-for="choice in choices"> <div x-show="show" x-transition> <button class="bg-white duration-100 ease-in-out p-4 rounded-xl" :class="chosen === false ? '' : (chosen === choice ? '' : 'p-2 bg-gray-700')" x-text="choice" @click="chosen = choice; choicesChosen.push(choice); if (d[choice] === 'exit') { inputPassword = true } else { currentName = d[choice] }" :disabled="chosen"></button> </div> </template> </div> </template> </div> </template> <div x-show="!messageData[currentName] || currentIndex != messageData[currentName].length" x-transition x-transition:leave.duration.0ms> <div class="text-bubble"><span class="animate-pulse">⬤</span><span class="animate-pulse animation-delay-150">⬤</span><span class="animate-pulse animation-delay-300">⬤</span></div> <div class="text-triangle"></div> </div>  <div x-data="{ clicked: false, show: false }" x-show="show && !clicked" x-init="document.addEventListener('scroll', () => { show = distanceToBottom() >= window.innerHeight / 3; if (distanceToBottom() == 0) clicked = false; }); $watch('currentName', () => { if (currentName === 'start') clicked = true });" x-transition x-transition:leave.duration.0ms class="bottom-8 fixed flex justify-center pointer-events-none w-full"> <button class="animate-bounce bg-blue-300 h-8 p-1 pointer-events-auto rounded-full text-center text-white w-8" @click="clicked = true; scrollToBottom();"> <svg class="block mx-auto" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0 6.75-6.75M12 19.5l-6.75-6.75"/></svg> </button> </div> </div> </template> <template x-if="inputPassword || (initialized == toInitialize && !Object.keys(messageData).length)" x-transition> <div class="backdrop-blur-sm fixed flex h-screen items-center justify-center left-0 top-0 w-screen"> <form @submit.prevent="search(password).then(res => [filename, messageData] = res).catch(() => messageData = {}); inputPassword = false"> <div class="bg-slate-500 flex flex-col gap-y-5 m-20 max-w-xl md:px-10 px-10 py-10 rounded-2xl text-slate-700"> <input class="border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-slate-600 hover:border-slate-600 p-4 rounded-full text-center" name="password" placeholder="Enter Password" x-model:value="password"> <input class="active:bg-slate-200 bg-white border-2 border-transparent focus:ring-4 focus:ring-slate-600 hover:border-slate-600 mx-20 rounded-full" type="submit" value="Enter"> </div> </form> </div> </template> </div> </body></html>
