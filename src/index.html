@@ -77,6 +77,10 @@ setTimeout(() => {
 })
 new ResizeObserver(scrollToBottom).observe($el);
                 ">
+                    <!-- Nav Bar-->
+                    <div class="sticky t-0 w-max flex justify-start">
+                        <button @click="inputPassword = 0"></button>
+                    </div>
                     <template x-for="(d, i) in toDisplay" :key="i">
                         <div x-data="{ show: false }" x-init="setTimeout(() => show = true, 0)">
                             <!-- Represents someone elses message -->
@@ -91,7 +95,7 @@ new ResizeObserver(scrollToBottom).observe($el);
                                 <div class="flex justify-around items-center flex-row mt-6 min-h-xs" x-data="{ choices: Object.keys(d), chosen: $persist(false).as('_x_choice_' + i).using(sessionStorage) }" x-init="chosen = choicesChosen.indexOf(chosen) >= 0 ? chosen : false">
                                     <template x-for="choice in choices">
                                         <div x-show="show" x-transition>
-                                            <button class="ease-in-out duration-100 bg-white rounded-xl p-4" :class="chosen === false ? '' : (chosen === choice ? '' : 'p-2 bg-gray-700')" x-text="choice" @click="chosen = choice; choicesChosen.push(choice); if (d[choice] === 'exit') { inputPassword = true } else { currentName = d[choice] }" :disabled="chosen"></button>
+                                            <button class="ease-in-out duration-100 bg-white rounded-xl px-2 py-4 md:px-4" :class="chosen === false ? '' : (chosen === choice ? '' : 'p-2 bg-gray-700')" x-text="choice" @click="chosen = choice; choicesChosen.push(choice); if (d[choice] === 'exit') { inputPassword = true } else { currentName = d[choice] }" :disabled="chosen"></button>
                                         </div>
                                     </template>
                                 </div>
