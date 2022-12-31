@@ -23,6 +23,7 @@
     "build": "yarn clean && parcel build src/index.html --public-url . && yarn post-build",
     "post-build": "node encrypt.js && workbox generateSW",
     "deploy": "gh-pages -d dist",
+    "buildDeploy": "yarn build && yarn deploy",
     "encrypt": "node encrypt.js",
     "clean": "rm -rf dist && rm -rf .parcel-cache"
   },
