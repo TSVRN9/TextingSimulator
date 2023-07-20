@@ -3,8 +3,8 @@
                     currentIndex: $persist(0).using(sessionStorage), 
                     currentName: $persist('start').using(sessionStorage), 
                     initialDelay: 1000, 
-                    delay: 1000, 
-                    delayPerLetter: 50, 
+                    delay: 500, 
+                    delayPerLetter: 60, 
                     choicesChosen: $persist([]).using(sessionStorage) }" x-init="
 $watch('messageData', () => {
     toDisplay = [];
