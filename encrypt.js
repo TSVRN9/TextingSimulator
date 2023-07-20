@@ -30,7 +30,7 @@ const files =
 
             // write to ./dist
             // .js to .json
-            const encryptedFilename = filename.substring(0, filename.length - '.js'.length) + '.json';
+            const encryptedFilename = CryptoJS.SHA3('texting-simlol' + filename).toString(CryptoJS.enc.Hex) + '.json';
             const encryptedpath = path.join(encryptedDirectory, encryptedFilename);
         
             const json = JSON.stringify({ 

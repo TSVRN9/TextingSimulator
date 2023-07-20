@@ -5,7 +5,7 @@ const utils = {
      * @returns Array
      */
     dialogue(text, choice) {
-        messages = text.split('\n').map(s => s.trim());
+        messages = text.split('\n').map(s => s.trim()).filter(s => s.length);
         return [
             ...messages,
             choice
@@ -17,7 +17,7 @@ const utils = {
      */
     end(text) {
         return utils.dialogue(text, { "Let's try again": 'start', "Whatever, I'm out": 'exit' });
-    }
+    },
 };
 
 module.exports = utils;
